@@ -1,0 +1,12 @@
+name: yukii.warnsystem
+version: '${version}'
+
+main: org.yukii.warnsystem.WarnSystem
+api-version: '1.21.11'
+folia-supported: true
+load: POSTWORLD
+commands:
+  пред:
+    description: Выдать предупреждение
+  преды:
+    description: Список предупреждений
