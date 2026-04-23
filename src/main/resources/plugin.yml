@@ -10,3 +10,7 @@ commands:
     description: Выдать предупреждение
   преды:
     description: Список предупреждений
+permissions:
+  warnsystem.use:
+    description: Позволяет выдавать предупреждения и смотреть чужую статистику
+    default: op

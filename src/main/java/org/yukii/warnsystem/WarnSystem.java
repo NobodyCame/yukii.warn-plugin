@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-//Почти всё здесь написано ии или дописано автодополнением IDE, что не сделано ИИ слеплено из стаковерфлоу и тому подобного, я никогда раньше не учил джаву, знаю только принцып работы языков програмированния
+//Почти всё здесь написано ИИ или дописано автодополнением IDE, что не сделано ИИ слеплено из стаковерфлоу и тому подобного, я никогда раньше не учил джаву, знаю только принцип работы языков программирования
 //JetBrains onelove <3
 public final class WarnSystem extends JavaPlugin implements CommandExecutor {
 
@@ -112,7 +112,7 @@ public final class WarnSystem extends JavaPlugin implements CommandExecutor {
                     .append(Component.text(target.getName(), NamedTextColor.WHITE))
                     .append(Component.text(" по причине: ", NamedTextColor.GRAY))
                     .append(Component.text(reason, NamedTextColor.YELLOW))
-                    .append(Component.text(" (количество предупреждений игрока "+ target.getName() + ": ", NamedTextColor.GRAY))
+                    .append(Component.text(" (количество предупреждений у игрока "+ target.getName() + ": ", NamedTextColor.GRAY))
                     .append(Component.text(count, NamedTextColor.RED))
                     .append(Component.text(")", NamedTextColor.GRAY));
 
@@ -126,17 +126,35 @@ public final class WarnSystem extends JavaPlugin implements CommandExecutor {
             Bukkit.getConsoleSender().sendMessage(localMsg);
 
             // Механика сброса предов через пол часа
-            target.getScheduler().runDelayed(this, (task) -> {
-                // Прошло ли полчаса с последнего преда
-                long lastTime = lastWarnTimestamp.getOrDefault(target.getUniqueId(), 0L);
-                long halfHourInMillis = 30 * 60 * 1000;
+            // До фикса с выходом
+//            target.getScheduler().runDelayed(this, (task) -> {
+//                // Прошло ли полчаса с последнего преда
+//                long lastTime = lastWarnTimestamp.getOrDefault(target.getUniqueId(), 0L);
+//                long halfHourInMillis = 30 * 60 * 1000;
+//
+//                if (System.currentTimeMillis() - lastTime >= halfHourInMillis) {
+//                    warns.remove(target.getUniqueId());
+//                    lastWarnTimestamp.remove(target.getUniqueId());
+//                    target.sendMessage(Component.text("Ваши предупреждения были аннулированы, не буяньте. (прошло 30 минут)", NamedTextColor.GREEN));
+//                }
+            UUID targetUUID = target.getUniqueId();
 
-                if (System.currentTimeMillis() - lastTime >= halfHourInMillis) {
-                    warns.remove(target.getUniqueId());
-                    lastWarnTimestamp.remove(target.getUniqueId());
-                    target.sendMessage(Component.text("Ваши предупреждения были аннулированы, не буяньте. (прошло 30 минут)", NamedTextColor.GREEN));
+            getServer().getGlobalRegionScheduler().runDelayed(this, (scheduledTask) -> {
+                Long lastActualMoment = lastWarnTimestamp.get(targetUUID);
+
+                if (lastActualMoment == null) return;
+
+                if (lastActualMoment.equals(now)){
+                    warns.remove(targetUUID);
+                    lastWarnTimestamp.remove(targetUUID);
+
+                    Player checkPlayer = Bukkit.getPlayer(targetUUID);
+                    if (checkPlayer != null && checkPlayer.isOnline()){
+
+                checkPlayer.sendMessage(Component.text("Ваши предупреждения были аннулированы, не буяньте. (прошло 30 минут)", NamedTextColor.GREEN));
+                    }
                 }
-            }, null, 36000L); // 36000 = 30 минут
+            }, 36000L); // 36000 = 30 минут
 
             return true;
         }
